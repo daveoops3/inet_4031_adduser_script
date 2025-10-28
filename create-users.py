@@ -1,71 +1,68 @@
 #!/usr/bin/python3
 
 # INET4031
-# Your Name
-# Data Created
-# Date Last Modified
+# Dave Cornell
+# 10/27/2025
+# 10/27/2025
 
-#REPLACE THIS COMMENT - identify what each of these imports is for.
+#Import os, is so that we can run bash cmds
+#Import re, is a libary that gives us functions that allow us to search for things
+#Import sys, gives us functions that allows us to maniupulate the OS
 import os
 import re
 import sys
 
-#YOUR CODE SHOULD HAVE NONE OF THE INSTRUCTORS COMMENTS REMAINING WHEN YOU ARE FINISHED
-#PLEASE REPLACE INSTRUCTOR "PROMPTS" WITH COMMENTS OF YOUR OWN
 
 def main():
     for line in sys.stdin:
 
-        #REPLACE THIS COMMENT - this "regular expression" is searching for the presence of a character - what is it and why?
-        #The important part is WHY it is looking for a particular characer - what is that character being used for?
+	#This line is searching for a pound sign in the file. This let's the code know to skip this line in the file
         match = re.match("^#",line)
 
-        #REPLACE THIS COMMENT - why is the code doing this?
+        #This line of code put's the information in a list so that it can more easily put it in the cmd prompt
         fields = line.strip().split(':')
 
-        #REPLACE THESE COMMENTS with a single comment describing the logic of the IF 
-        #what would an appropriate comment be for describing what this IF statement is checking for?
-        #what happens if the IF statement evaluates to true?
-        #how does this IF statement rely on what happened in the prior two lines of code? The match and fields lines.
-        #the code clearly shows that the variables match and the length of fields is being checked for being != 5  so why is it doing that?
+        #This IF statment is chaecking for if the line has a pound sign or less then 5 fields in the list
+        #If the IF statment evalutes as true then it knows it will skip over the line because it will cause a logic error
+        #If there is a pound sign then match will = true which will tell the IF statment to skip that line and if the field list has less than five items in it, it will be true too
+        #Those prior two lines just checks the code, without the IF statment, the code would not skip those lines of input.
         if match or len(fields) != 5:
             continue
 
-        #REPLACE THIS COMMENT - what is the purpose of the next three lines. How does it relate to what is stored in the passwd file?
+        #Theses lines of code put the data from the field list into variables, which will make it more readable in the code
         username = fields[0]
         password = fields[1]
         gecos = "%s %s,,," % (fields[3],fields[2])
 
-        #REPLACE THIS COMMENT - why is this split being done?
+        #This line gets ride of the ',' if there is more than one group in the input
         groups = fields[4].split(',')
 
-        #REPLACE THIS COMMENT - what is the point of this print statement?
+        #This let's the sysadmin know that the code is working and that it's make this specific user
         print("==> Creating account for %s..." % (username))
-        #REPLACE THIS COMMENT - what is this line doing?  What will the variable "cmd" contain.
+	#This line is storing the bash command into a variable. The "cmd" variable will contain a bash command that will add this specific user
         cmd = "/usr/sbin/adduser --disabled-password --gecos '%s' %s" % (gecos,username)
 
-        #REMOVE THIS COMMENT AFTER YOU UNDERSTAND WHAT TO DO - these statements are currently "commented out" as talked about in class
-        #The first time you run the code...what should you do here?  If uncommented - what will the os.system(cmd) statemetn attempt to do?
+	#The first time I run the code I should check for any bugs, since we are dealing with Bash, we don't want to cause any bugs that will make it harder to remove.
+	#Once uncommented, the os.system(cmd) will run what's stored in the cmd variable, which will make a new user with all the info from input file.
         #print cmd
-        #os.system(cmd)
+        os.system(cmd)
 
-        #REPLACE THIS COMMENT - what is the point of this print statement?
+        #This print statment let's use know that the password is being set for this specific user
         print("==> Setting the password for %s..." % (username))
-        #REPLACE THIS COMMENT - what is this line doing?  What will the variable "cmd" contain. You'll need to lookup what these linux commands do.
+	#This line is changing what is stored in the cmd variable to a new linux cmd. 'echo' prints to the command line, -n means no extra newline at the end, the -e tells us to interpret escape like charaters like. The '|' command puts in the next command after the first one.Finally the other linux commands sets and confirms the password for the new user.
         cmd = "/bin/echo -ne '%s\n%s' | /usr/bin/sudo /usr/bin/passwd %s" % (password,password,username)
 
-        #REMOVE THIS COMMENT AFTER YOU UNDERSTAND WHAT TO DO - these statements are currently "commented out" as talked about in class
-        #The first time you run the code...what should you do here?  If uncommented - what will the os.system(cmd) statemetn attempt to do?
+	#The first time I run the code I should understand what is happening so that I know when I run it, it won't cause any errors. Once uncommented the os.system(cmd) will add the passwords for the new user.
         #print cmd
-        #os.system(cmd)
+        os.system(cmd)
 
         for group in groups:
-            #REPLACE THIS COMMENT with one that answers "What is this IF statement looking for and why? If group !='-' what happens?"
+            #The if statment is looking for this '-'. This lets the if statement know that the user is not apart of any groups.
             if group != '-':
                 print("==> Assigning %s to the %s group..." % (username,group))
                 cmd = "/usr/sbin/adduser %s %s" % (username,group)
                 #print cmd
-                #os.system(cmd)
+                os.system(cmd)
 
 if __name__ == '__main__':
     main()
